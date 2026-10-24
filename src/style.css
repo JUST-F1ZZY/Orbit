@@ -1,0 +1,48 @@
+:root {
+  --bg: #111310;
+  --card: #1b1e1a;
+  --text: #f2ede6;
+  --muted: #a39d94;
+  --accent: #e8a8a0;
+  --accent-text: #2a1714;
+  color-scheme: dark;
+}
+
+* { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--text);
+  font: 16px/1.5 system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+  /* Keeps content clear of the notch with black-translucent status bar. */
+  padding: env(safe-area-inset-top) 16px env(safe-area-inset-bottom);
+}
+
+main { max-width: 480px; margin: 0 auto; padding: 32px 0; }
+
+.hero { text-align: center; margin-bottom: 24px; }
+.hero img { border-radius: 20px; }
+.hero h1 { margin: 12px 0 4px; font-size: 2rem; }
+.hero p { margin: 0; color: var(--muted); }
+
+.card { background: var(--card); border-radius: 16px; padding: 16px 18px; margin-bottom: 16px; }
+.card h2 { margin: 0 0 6px; font-size: 1.1rem; }
+.notice { border: 1px solid var(--accent); }
+
+.row { display: flex; gap: 10px; flex-wrap: wrap; }
+
+button, .button {
+  background: var(--accent);
+  color: var(--accent-text);
+  border: 0;
+  border-radius: 999px;
+  padding: 10px 18px;
+  font: inherit;
+  font-weight: 600;
+  cursor: pointer;
+}
+.secondary { background: transparent; color: var(--accent); border: 1px solid var(--accent); }
+
+.muted { color: var(--muted); font-size: 0.9rem; }
+footer { text-align: center; margin-top: 24px; }

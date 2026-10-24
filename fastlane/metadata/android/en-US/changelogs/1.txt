@@ -1,0 +1,5 @@
+First release.
+• Cycle and symptom logging
+• Phase view and adaptive predictions with confidence levels
+• Data export
+• Fully offline, no network access
