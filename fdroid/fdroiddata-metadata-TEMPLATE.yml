@@ -1,0 +1,25 @@
+# Goes in the fdroiddata repo (gitlab.com/fdroid/fdroiddata) as
+# metadata/<your.package.id>.yml via a merge request. Only works once
+# Orbit builds as a real Android APK from source (see PWA-REVIEW.md).
+Categories:
+  - Health & Fitness
+License: GPL-3.0-only
+AuthorName: Hunter
+SourceCode: https://github.com/JUST-F1ZZY/Orbit
+IssueTracker: https://github.com/JUST-F1ZZY/Orbit/issues
+Changelog: https://github.com/JUST-F1ZZY/Orbit/releases
+Donate: https://ko-fi.com/fizzyyy052326
+
+AutoName: Orbit
+RepoType: git
+Repo: https://github.com/JUST-F1ZZY/Orbit.git
+
+# Build block depends on the wrapper (Capacitor etc.). Fill in once it exists.
+# Builds:
+#   - versionName: 1.0.0
+#     versionCode: 1
+#     commit: v1.0.0
+#     ...
+
+AutoUpdateMode: Version
+UpdateCheckMode: Tags

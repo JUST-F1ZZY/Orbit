@@ -1,0 +1,1 @@
+Offline period & cycle tracker. No account, no server, no tracking.

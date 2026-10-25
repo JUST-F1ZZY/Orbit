@@ -1,0 +1,25 @@
+Orbit is a period and cycle tracker that keeps everything on your phone. It has no account, no server, and no analytics, so your cycle data is never uploaded, sold, or shared. There is nothing to leak or subpoena because it never leaves your device.
+
+<b>Features</b>
+<ul>
+<li>Log period days, flow, symptoms, mood, energy and notes</li>
+<li>See your current phase (menstrual, follicular, ovulation window, luteal) at a glance</li>
+<li>Predictions that adapt to you: Orbit starts from typical averages and learns your own cycle length, variation and symptom patterns as you log more</li>
+<li>Every prediction shows how confident it is, so you know when it's a rough guess</li>
+<li>Export your data to a file anytime for backup or to move it</li>
+<li>Fully offline, no internet permission needed</li>
+</ul>
+
+<b>Privacy by design</b>
+<ul>
+<li>No sign-up, no email, no cloud sync</li>
+<li>No ads, no trackers, no third-party SDKs</li>
+<li>Free and open source (GPL-3.0), so anyone can verify these claims</li>
+</ul>
+
+<b>Important</b>
+Orbit is a logging and pattern tool, not a medical device. Predictions are estimates. Do not use Orbit as contraception. Talk to a healthcare professional about any health concerns.
+
+Because your data is only on your device, export a backup now and then. If you uninstall without exporting, nobody can recover it.
+
+Orbit is free with no ads or premium tier. If it helps you, tips are welcome but never required.
