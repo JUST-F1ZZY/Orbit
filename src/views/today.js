@@ -90,9 +90,10 @@ export function render(app) {
   if (!a.lastPeriod) {
     return `${header}
     <section class="card center">
-      <h2>Log your first period</h2>
-      <p class="muted">When your next period starts, tap the button and mark the flow. Orbit starts predicting from there.</p>
+      <h2>Start logging</h2>
+      <p class="muted">Log how you feel any day. Once you mark a period, Orbit starts predicting from there.</p>
       <button id="log-today" class="wide">Log today</button>
+      <p class="muted small">Had a period recently? Mark those days in the Calendar.</p>
     </section>`;
   }
 

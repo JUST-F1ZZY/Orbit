@@ -267,3 +267,11 @@ textarea { resize: vertical; }
 @media (prefers-reduced-motion: reduce) {
   * { transition: none !important; }
 }
+
+/* Optional onboarding setup */
+.setup { margin-top: 18px; }
+.setup summary { cursor: pointer; font-weight: 600; color: var(--accent); list-style: none; }
+.setup summary::-webkit-details-marker { display: none; }
+.setup summary::after { content: ' ▾'; }
+.setup[open] summary::after { content: ' ▴'; }
+.setup form { margin-top: 6px; }
