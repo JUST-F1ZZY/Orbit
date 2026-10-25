@@ -1,5 +1,5 @@
 import * as db from '../db.js';
-import { KOFI_URL, SOURCE_URL, VERSION } from '../config.js';
+import { KOFI_URL, SUPPORT_NOTE, SOURCE_URL, VERSION } from '../config.js';
 import { makePin, validPin } from '../lock.js';
 import { formatDate } from '../dates.js';
 import { $, toast, openSheet, closeSheet } from '../ui.js';
@@ -57,7 +57,8 @@ export function render(app) {
     <h2>About</h2>
     <p class="muted small">Hi, I'm Hunter. I build free health tools. I'm a guy, which is exactly why Orbit is built so that nobody, me included, ever sees your data.</p>
     <p class="muted small"><b>Orbit is not medical advice and not birth control.</b> Predictions are estimates from your own logs. If something about your cycle worries you, talk to a doctor or nurse.</p>
-    ${KOFI_URL ? `<a class="link" href="${KOFI_URL}" target="_blank" rel="noopener noreferrer">If Orbit helped you, you can tip on Ko-fi ↗</a>` : ''}
+    ${KOFI_URL ? `<p class="muted small">${SUPPORT_NOTE}</p>
+    <a class="link" href="${KOFI_URL}" target="_blank" rel="noopener noreferrer">If Orbit helped you, you can tip on Ko-fi ↗</a>` : ''}
   </section>
 
   <section class="card danger">
