@@ -23,7 +23,7 @@
   <img src="docs/screenshot-insights.png" width="230" alt="Insights screen">
 </p>
 
-> **Status: early development.** Storage, offline install, and export/import work now. The logging screens and predictions are being built next.
+> **Status: early beta.** Everything below works, but it hasn't had many real users yet. Bug reports and feedback are very welcome.
 
 ---
 
@@ -33,14 +33,25 @@ After Roe v. Wade was overturned, a lot of people stopped trusting period apps, 
 
 Orbit fixes that with how it's built, not with a promise. There's no Orbit server, so there's nothing to sell, leak, hack, or subpoena. If you want to know whether that's true, read the code or get a technical friend to.
 
-## What it does (planned for v1)
+## What it does
 
 - **Log your cycle.** Period days, flow, symptoms, mood, energy, and notes.
 - **See where you are.** The app shows your current phase (menstrual, follicular, ovulation window, luteal) and how many days are left.
 - **Predictions that learn you.** For the first few cycles Orbit uses typical averages. As you log more, it adjusts to *your* cycle length, how much it varies, and which symptoms usually show up when, and how bad they tend to get.
 - **Honest confidence.** Every prediction shows how sure it is. Three logged cycles give a rough guess, and a year of logs gives a much better one. It never pretends to know more than it does.
+- **Insights.** Your average cycle, how much it varies, and which symptoms, moods, and energy levels show up in each phase.
 - **Export and back up.** Download your data as a file anytime. You own it, so you can move it, back it up, or delete it.
 - **Works offline.** Once it's installed you don't need internet at all.
+
+## How the predictions work
+
+Everything runs on your phone in [`src/cycle.js`](src/cycle.js), and it's tested in [`tests/cycle.test.js`](tests/cycle.test.js).
+
+- **Cycle length** is a weighted average of the gaps between your period starts, with recent cycles counting more. Until you've logged a few cycles, it leans on the cycle length in your settings.
+- **The range** ("likely Oct 28 to Nov 1") comes from how much your cycles have varied. The more regular you are, the tighter it gets.
+- **Ovulation** is estimated as 14 days before your next predicted period. That's a textbook average, not a measurement. Don't use it to avoid or plan pregnancy.
+- **Symptom forecasts** look at which symptoms you logged at the same point in past cycles. If something showed up in at least half of them, Orbit says it's likely and how bad it usually is. Forecasts start after two logged cycles.
+- **Gaps longer than 60 days** are treated as missed logging and left out, so they don't throw off the average.
 
 ## How the privacy works
 
@@ -86,6 +97,7 @@ cd orbit
 npm install
 npm run dev      # local dev server
 npm run build    # production build in dist/
+npm test         # prediction engine tests
 ```
 
 ## Contributing
