@@ -121,6 +121,9 @@ export function analyze(entries, settings, todayISO) {
 
   const nextStart = addDays(lastPeriod.start, cycleLength);
   result.today = todayISO;
+  // "Period ended" tapped on or after the last bleeding day: stop treating it as ongoing.
+  result.endedMarked = sorted.some((e) => e.periodEnded && e.date >= lastPeriod.end && e.date <= todayISO);
+  result.periodOngoing = !result.endedMarked && diffDays(lastPeriod.end, todayISO) <= 1;
   result.projectedStart = nextStart > todayISO ? nextStart : addDays(todayISO, 1);
   result.cycleDay = diffDays(lastPeriod.start, todayISO) + 1;
   result.nextStart = nextStart;
@@ -176,9 +179,9 @@ export function phaseOn(dateISO, a) {
   // Overdue: still the end of the current cycle, period expected any day.
   if (!projected && offset >= a.cycleLength) return 'luteal';
   // Early in the current cycle: it's still the period only if bleeding was
-  // logged today or yesterday. Otherwise it ended earlier than usual.
+  // logged today or yesterday and it wasn't marked as ended.
   if (!projected && offset < a.periodLength) {
-    return diffDays(a.lastPeriod.end, a.today) <= 1 ? 'menstrual' : 'follicular';
+    return a.periodOngoing ? 'menstrual' : 'follicular';
   }
   return classify(offset, a.cycleLength, a.periodLength);
 }

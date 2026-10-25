@@ -119,3 +119,11 @@ test('a period that stopped early is not extended to the usual length', () => {
   const b = analyze(periodsAt(['2026-03-01'], 3), settings, '2026-03-03');
   assert.equal(phaseOn('2026-03-04', b), 'menstrual');
 });
+
+test('tapping "period ended" stops the period even within the usual length', () => {
+  const entries = [...periodsAt(['2026-03-01'], 2), { date: '2026-03-03', periodEnded: true }];
+  const a = analyze(entries, settings, '2026-03-03');
+  assert.equal(a.periodOngoing, false);
+  assert.equal(phaseOn('2026-03-03', a), 'follicular');
+  assert.equal(phaseOn('2026-03-04', a), 'follicular');
+});

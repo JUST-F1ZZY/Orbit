@@ -1,6 +1,7 @@
 import { PHASES, SEVERITY, forecastAhead, symptomLabel as symLabel } from '../cycle.js';
-import { formatDate } from '../dates.js';
-import { $, esc } from '../ui.js';
+import * as db from '../db.js';
+import { formatDate, addDays, diffDays } from '../dates.js';
+import { $, esc, toast } from '../ui.js';
 
 // The cycle wheel: four phase arcs and a dot for today.
 function ring(a) {
@@ -83,6 +84,39 @@ function todayLogSummary(app) {
   return `<p class="muted small logged-today">Logged today: ${bits.join(' · ') || 'mood/energy'}</p>`;
 }
 
+// One-tap buttons so a period doesn't take five trips through the log sheet.
+function quickActions(app) {
+  const a = app.analysis;
+  const e = app.byDate.get(app.today);
+  const bleedingToday = e?.flow && e.flow !== 'spotting';
+  const log = `<button id="log-today" class="secondary">${e ? 'Edit today' : 'Log today'}</button>`;
+  let main = '';
+  if (a.periodOngoing) {
+    main = (bleedingToday ? '' : '<button data-action="still">Still bleeding</button>') +
+      '<button data-action="ended" class="secondary">Period ended</button>';
+  } else if (a.phase === 'menstrual') {
+    // Bled today but already marked it as the last day.
+    main = '';
+  } else {
+    main = '<button data-action="started">Period started</button>';
+  }
+  return `<div class="row center-row quick">${main}${log}</div>`;
+}
+
+// Nudge to export when there's real data and no backup in 30 days.
+function backupNudge(app) {
+  const s = app.settings;
+  if (app.entries.length < 5) return '';
+  if (s.backupSnoozedUntil && app.today < s.backupSnoozedUntil) return '';
+  const age = s.lastBackup ? diffDays(s.lastBackup, app.today) : null;
+  if (age !== null && age < 30) return '';
+  return `<section class="card notice">
+    <b>${age === null ? "You haven't backed up yet" : `Last backup was ${age} days ago`}</b>
+    <p class="muted small">Your data only lives on this phone. A backup file is the only way to get it back if the phone is lost.</p>
+    <div class="row"><button data-action="backup">Back up now</button><button data-action="snooze" class="secondary">Later</button></div>
+  </section>`;
+}
+
 export function render(app) {
   const a = app.analysis;
   const header = `<header class="page-head"><p class="muted">${formatDate(app.today, { weekday: 'long', month: 'long', day: 'numeric' })}</p><h1>Today</h1></header>`;
@@ -92,7 +126,10 @@ export function render(app) {
     <section class="card center">
       <h2>Start logging</h2>
       <p class="muted">Log how you feel any day. Once you mark a period, Orbit starts predicting from there.</p>
-      <button id="log-today" class="wide">Log today</button>
+      <div class="row center-row">
+        <button data-action="started">Period started today</button>
+        <button id="log-today" class="secondary">Log today</button>
+      </div>
       <p class="muted small">Had a period recently? Mark those days in the Calendar.</p>
     </section>`;
   }
@@ -112,12 +149,11 @@ export function render(app) {
     <p class="muted small phase-blurb">${phase.blurb}</p>
   </section>
 
-  <div class="row center-row">
-    <button id="log-today">${app.byDate.has(app.today) ? 'Edit today' : 'Log today'}</button>
-  </div>
+  ${quickActions(app)}
   ${todayLogSummary(app)}
 
   ${lateNote}
+  ${backupNudge(app)}
 
   <section class="card">
     <h2>Next period</h2>
@@ -138,5 +174,37 @@ export function render(app) {
 
 export function bind(app, root) {
   $('#log-today', root)?.addEventListener('click', () => app.openLog(app.today));
+  root.addEventListener('click', async (ev) => {
+    const action = ev.target.closest('[data-action]')?.dataset.action;
+    if (!action) return;
+    const merge = (date, fields) => db.put({ ...(app.byDate.get(date) || { date }), ...fields });
+    const bleeding = (date) => {
+      const flow = app.byDate.get(date)?.flow;
+      return flow && flow !== 'spotting' ? flow : 'medium';
+    };
+    if (action === 'started') {
+      await merge(app.today, { flow: bleeding(app.today), periodEnded: undefined });
+      toast('Period started. Tap Edit today to change the flow.');
+    }
+    if (action === 'still') {
+      // Fill a forgotten day or two since the last logged bleeding day.
+      const end = app.analysis.lastPeriod.end;
+      const from = diffDays(end, app.today) <= 2 ? addDays(end, 1) : app.today;
+      for (let d = from; d <= app.today; d = addDays(d, 1)) await merge(d, { flow: bleeding(d) });
+      toast('Logged');
+    }
+    if (action === 'backup') {
+      if (!(await db.exportData())) return;
+      toast('Backup saved');
+    }
+    if (action === 'snooze') {
+      await db.saveSettings({ ...app.settings, backupSnoozedUntil: addDays(app.today, 7) });
+    }
+    if (action === 'ended') {
+      await merge(app.today, { periodEnded: true });
+      toast('Period marked as ended');
+    }
+    app.reload();
+  });
 }
 

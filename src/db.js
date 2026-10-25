@@ -1,6 +1,8 @@
 // All of Orbit's data lives here, in IndexedDB on the user's device.
 // Nothing in this file (or anywhere else) sends it over the network.
 
+import { today } from './dates.js';
+
 const DB_NAME = 'orbit';
 const DB_VERSION = 2;
 const ENTRIES = 'entries';
@@ -56,21 +58,38 @@ export async function requestPersistence() {
   return false;
 }
 
-// Export is the only backup, since there's no server. Downloads a JSON file.
+// Export is the only backup, since there's no server. On phones it opens the
+// Share sheet (Save to Files, AirDrop, email to yourself), because iOS often
+// can't download files from a home-screen app. Elsewhere it downloads a file.
+// Resolves true once the file was handed off, false if the user cancelled.
 export async function exportData() {
   const data = {
     app: 'orbit',
     version: DB_VERSION,
     exportedAt: new Date().toISOString(),
-    settings: await getSettings(),
+    settings: { ...(await getSettings()), pin: undefined },
     entries: await getAll(),
   };
-  const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
-  const a = document.createElement('a');
-  a.href = URL.createObjectURL(blob);
-  a.download = `orbit-backup-${data.exportedAt.slice(0, 10)}.json`;
-  a.click();
-  URL.revokeObjectURL(a.href);
+  const name = `orbit-backup-${data.exportedAt.slice(0, 10)}.json`;
+  const file = new File([JSON.stringify(data, null, 2)], name, { type: 'application/json' });
+
+  const touch = window.matchMedia('(pointer: coarse)').matches;
+  if (touch && navigator.canShare?.({ files: [file] })) {
+    try {
+      await navigator.share({ files: [file], title: 'Orbit backup' });
+    } catch (err) {
+      if (err.name === 'AbortError') return false;
+      throw err;
+    }
+  } else {
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(file);
+    a.download = name;
+    a.click();
+    setTimeout(() => URL.revokeObjectURL(a.href), 1000);
+  }
+  await saveSettings({ ...(await getSettings()), lastBackup: today() });
+  return true;
 }
 
 // Merges a backup file into the current data. Same-day entries are overwritten.
@@ -80,6 +99,9 @@ export async function importData(file) {
   for (const entry of data.entries) {
     if (typeof entry.date === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(entry.date)) await put(entry);
   }
-  if (data.settings) await saveSettings({ ...(await getSettings()), ...data.settings, onboarded: true });
+  if (data.settings) {
+    const { pin, lastBackup, ...rest } = data.settings;
+    await saveSettings({ ...(await getSettings()), ...rest, onboarded: true });
+  }
   return data.entries.length;
 }

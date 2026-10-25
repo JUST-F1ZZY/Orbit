@@ -110,6 +110,7 @@ export function openLog(app, date) {
         ...(values.mood !== '' && { mood: Number(values.mood) }),
         ...(values.energy !== '' && { energy: Number(values.energy) }),
         ...(note && { note }),
+        ...(e.periodEnded && { periodEnded: true }),
       };
       if (Object.keys(entry).length === 1) await db.remove(date);
       else await db.put(entry);

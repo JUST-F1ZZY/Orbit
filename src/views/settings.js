@@ -1,6 +1,8 @@
 import * as db from '../db.js';
 import { KOFI_URL, SOURCE_URL, VERSION } from '../config.js';
-import { $, toast } from '../ui.js';
+import { makePin, validPin } from '../lock.js';
+import { formatDate } from '../dates.js';
+import { $, toast, openSheet, closeSheet } from '../ui.js';
 
 export function render(app) {
   const s = app.settings;
@@ -28,9 +30,20 @@ export function render(app) {
   <section class="card">
     <h2>Backup</h2>
     <p class="muted small">Your data lives only on this phone. If you lose the phone or clear browser data without a backup, nobody can recover it, including me. Export now and then.</p>
+    <p class="small"><b>Last backup:</b> ${s.lastBackup ? formatDate(s.lastBackup, { month: 'short', day: 'numeric', year: 'numeric' }) : 'never'}</p>
     <div class="row">
       <button id="export">Export backup</button>
       <label class="button secondary">Import backup<input id="import" type="file" accept="application/json,.json" hidden></label>
+    </div>
+  </section>
+
+  <section class="card">
+    <h2>App lock</h2>
+    <p class="muted small">Ask for a PIN when Orbit opens, and again after a minute in the background. It stops someone casually opening Orbit on your phone. It doesn't encrypt your data, and a forgotten PIN can't be recovered.</p>
+    <div class="row">
+      ${s.pin
+        ? '<button id="pin-set" class="secondary">Change PIN</button><button id="pin-off" class="secondary">Turn off</button>'
+        : '<button id="pin-set" class="secondary">Set a PIN</button>'}
     </div>
   </section>
 
@@ -67,7 +80,44 @@ export function bind(app, root) {
     toast('Saved');
     app.reload();
   });
-  $('#export', root).addEventListener('click', () => db.exportData());
+  $('#export', root).addEventListener('click', async () => {
+    if (await db.exportData()) {
+      toast('Backup saved');
+      app.reload();
+    }
+  });
+
+  $('#pin-set', root).addEventListener('click', () => {
+    const sheet = openSheet(`
+      <header class="sheet-head"><h2>${app.settings.pin ? 'Change PIN' : 'Set a PIN'}</h2>
+        <button type="button" class="icon-btn" data-close aria-label="Close">✕</button></header>
+      <form id="pin-form" autocomplete="off">
+        <label class="field"><span>New PIN (4 to 8 digits)</span>
+          <input id="pin1" type="password" inputmode="numeric" pattern="[0-9]*" maxlength="8"></label>
+        <label class="field"><span>Type it again</span>
+          <input id="pin2" type="password" inputmode="numeric" pattern="[0-9]*" maxlength="8"></label>
+        <p class="muted small">Write it down somewhere safe. If you forget it, the only fix is erasing Orbit's data.</p>
+        <button type="submit" class="wide">Save PIN</button>
+      </form>`);
+    $('#pin-form', sheet).addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const p1 = $('#pin1', sheet).value;
+      if (!validPin(p1)) return toast('Use 4 to 8 digits');
+      if (p1 !== $('#pin2', sheet).value) return toast("The PINs don't match");
+      await db.saveSettings({ ...app.settings, pin: await makePin(p1) });
+      app.unlocked = true;
+      closeSheet();
+      toast('PIN set');
+      app.reload();
+    });
+  });
+  $('#pin-off', root)?.addEventListener('click', async () => {
+    if (!confirm('Turn off the PIN lock?')) return;
+    const { pin, ...rest } = app.settings;
+    await db.saveSettings(rest);
+    toast('PIN lock off');
+    app.reload();
+  });
   $('#import', root).addEventListener('change', async (e) => {
     try {
       const n = await db.importData(e.target.files[0]);

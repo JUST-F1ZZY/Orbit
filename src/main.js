@@ -9,6 +9,7 @@ import * as calendar from './views/calendar.js';
 import * as insights from './views/insights.js';
 import * as settingsView from './views/settings.js';
 import { openLog } from './views/log.js';
+import { renderLock, bindLock } from './lock.js';
 
 const VIEWS = {
   today: { label: 'Today', icon: '<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="8"/><circle cx="12" cy="4" r="2.2" class="fill"/></svg>', view: todayView },
@@ -27,6 +28,8 @@ const app = {
   today: today(),
   current: 'today',
   calendarMonth: null,
+  unlocked: false,
+  hiddenAt: 0,
 
   async reload() {
     this.today = today();
@@ -48,7 +51,16 @@ const app = {
   },
 
   render() {
-    const root = $('#app');
+    // Each render gets a fresh element, so listeners from the last screen go with it.
+    const root = document.createElement('div');
+    $('#app').replaceChildren(root);
+    if (this.settings.pin && !this.unlocked) {
+      closeSheet();
+      root.innerHTML = renderLock();
+      bindLock(this, root);
+      $('#tabs')?.remove();
+      return;
+    }
     if (!this.settings.onboarded) {
       root.innerHTML = onboarding.render(this);
       onboarding.bind(this, root);
@@ -81,8 +93,18 @@ function renderTabs(a) {
 }
 
 // Coming back to the app on a new day should move "today" forward.
+// Re-lock after a minute in the background.
+const RELOCK_MS = 60000;
 document.addEventListener('visibilitychange', () => {
-  if (document.visibilityState === 'visible' && today() !== app.today) app.reload();
+  if (document.visibilityState === 'hidden') {
+    app.hiddenAt = Date.now();
+    return;
+  }
+  if (app.settings.pin && Date.now() - app.hiddenAt > RELOCK_MS) {
+    app.unlocked = false;
+    app.render();
+  }
+  if (today() !== app.today) app.reload();
 });
 
 db.requestPersistence();
