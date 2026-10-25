@@ -73,7 +73,7 @@ Predictions are estimates from your own logs. **Don't use Orbit as birth control
 
 ## About
 
-I'm Hunter, a student into cybersecurity. I built Orbit with help from AI coding tools, and I review what goes in. Since it's all open source, you can check everything yourself.
+I'm Hunter, a student into cybersecurity. Since it's all open source, you can check everything yourself.
 
 If something's confusing or missing, [open an issue](../../issues).
 
