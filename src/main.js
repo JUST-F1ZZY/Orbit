@@ -10,6 +10,7 @@ import * as insights from './views/insights.js';
 import * as settingsView from './views/settings.js';
 import { openLog } from './views/log.js';
 import { renderLock, bindLock } from './lock.js';
+import { KOFI_URL } from './config.js';
 
 const VIEWS = {
   today: { label: 'Today', icon: '<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="8"/><circle cx="12" cy="4" r="2.2" class="fill"/></svg>', view: todayView },
@@ -59,12 +60,14 @@ const app = {
       root.innerHTML = renderLock();
       bindLock(this, root);
       $('#tabs')?.remove();
+      $('#tip')?.remove();
       return;
     }
     if (!this.settings.onboarded) {
       root.innerHTML = onboarding.render(this);
       onboarding.bind(this, root);
       $('#tabs')?.remove();
+      $('#tip')?.remove();
       return;
     }
     const { view } = VIEWS[this.current];
@@ -75,6 +78,17 @@ const app = {
 };
 
 function renderTabs(a) {
+  // Small always-visible tip link, bottom left above the tabs.
+  if (KOFI_URL && !$('#tip')) {
+    const tip = document.createElement('a');
+    tip.id = 'tip';
+    tip.href = KOFI_URL;
+    tip.target = '_blank';
+    tip.rel = 'noopener noreferrer';
+    tip.innerHTML = '<span aria-hidden="true">♥</span> Tip';
+    tip.setAttribute('aria-label', 'Support Orbit with a tip on Ko-fi');
+    document.body.append(tip);
+  }
   let nav = $('#tabs');
   if (!nav) {
     nav = document.createElement('nav');
