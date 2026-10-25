@@ -52,7 +52,7 @@ Orbit fixes that with how it's built, not with a promise. There's no Orbit serve
 | No account | There's no sign-up, so no email, name, or password is ever collected. |
 | Open source | The whole app is in this repo under the GPL-3.0 license. Anyone can audit, fork, or build it themselves. |
 
-**One honest limit:** because your data only lives on your phone, if you lose the phone or clear the browser data without exporting first, it's gone. Nobody, including me, can recover it. Use **Settings → Export** now and then.
+**One honest limit:** because your data only lives on your phone, if you lose the phone or clear the browser data without exporting first, it's gone. Nobody, including me, can recover it. Use **Settings → Export** now and then. (Optional opt-in planned for future)
 
 ## Install
 
@@ -70,7 +70,7 @@ Orbit is a web app you install to your home screen. It's free, there's no app st
 Orbit is a logging and pattern tool. Its predictions are **estimates** from your past entries, and bodies don't always follow patterns.
 
 - **Do not use Orbit to prevent pregnancy.** "Safe day" or fertile-window estimates aren't reliable contraception.
-- It can't diagnose anything. If your cycle changes suddenly, or pain, bleeding, or mood symptoms get worse, talk to a doctor or nurse.
+- It won't diagnose anything. If your cycle changes suddenly, or pain, bleeding, or mood symptoms get worse, talk to a doctor or nurse.
 
 ## Who made this
 
