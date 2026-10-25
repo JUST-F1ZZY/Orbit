@@ -13,7 +13,7 @@
   <a href="https://just-f1zzy.github.io/Orbit/">Open the app</a> ·
   <a href="#install">Install</a> ·
   <a href="#how-the-privacy-works">How the privacy works</a> ·
-  <a href="https://ko-fi.com/YOUR-KOFI">Support</a>
+  <a href="https://ko-fi.com/fizzyyy052326">Support</a>
 </p>
 
 <!-- Screenshots: replace with real ones. 3 is plenty. -->
@@ -106,7 +106,7 @@ Bug reports, design feedback, translations, and code are all welcome. One hard r
 
 ## Support
 
-Orbit is free and will stay free, with no ads, no premium tier, and no data deals. If it helped you and you want to say thanks, you can [buy me a coffee on Ko-fi](https://ko-fi.com/YOUR-KOFI). Totally optional.
+Orbit is free and will stay free, with no ads, no premium tier, and no data deals. If it helped you and you want to say thanks, you can [buy me a coffee on Ko-fi](https://ko-fi.com/fizzyyy052326). Totally optional.
 
 ## License
 
