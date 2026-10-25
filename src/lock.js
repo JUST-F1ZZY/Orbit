@@ -1,9 +1,5 @@
-// Optional PIN lock. The PIN itself is never stored: only a salted PBKDF2
-// hash, so reading the settings doesn't reveal it.
-//
-// Honest limit: this stops someone casually opening Orbit on your phone. It
-// does not encrypt the data, so someone with developer tools and your
-// unlocked phone could still read it.
+// PIN lock. only a salted PBKDF2 hash is stored.
+// NOTE: doesn't encrypt anything, it just keeps people out of the UI
 
 import * as db from './db.js';
 import { $, toast } from './ui.js';

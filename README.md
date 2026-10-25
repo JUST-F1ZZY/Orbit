@@ -5,109 +5,96 @@
 <h1 align="center">Orbit</h1>
 
 <p align="center">
-  <b>A period tracker that physically can't spy on you.</b><br>
-  No account. No server. No analytics. Your data never leaves your phone, and the code is here so you can check.
+  A period tracker that keeps everything on your phone.<br>
+  No account, no server, no analytics.
 </p>
 
 <p align="center">
   <a href="https://just-f1zzy.github.io/Orbit/">Open the app</a> ·
   <a href="#install">Install</a> ·
-  <a href="#how-the-privacy-works">How the privacy works</a> ·
+  <a href="#privacy">Privacy</a> ·
   <a href="https://ko-fi.com/fizzyyy052326">Support</a>
 </p>
 
-<!-- Screenshots: replace with real ones. 3 is plenty. -->
 <p align="center">
   <img src="docs/screenshot-today.png" width="230" alt="Today screen">
   <img src="docs/screenshot-calendar.png" width="230" alt="Calendar screen">
   <img src="docs/screenshot-insights.png" width="230" alt="Insights screen">
 </p>
 
-> **Status: early beta.** Everything below works, but it hasn't had many real users yet. Bug reports and feedback are very welcome.
+Early beta. It works, but not many people have used it yet, so please report bugs.
 
----
+## Why
 
-## Why this exists
+A lot of period apps send your data to their servers, and some share it with advertisers. Since Roe v. Wade got overturned, that data can also end up in court. Orbit doesn't have a server, so there's nothing to sell or hand over. You don't have to take my word for it, the code is all here.
 
-After Roe v. Wade was overturned, a lot of people stopped trusting period apps, and with good reason. Many of the big ones collected cycle data on their servers, shared it with advertisers or analytics companies, and some of that data can be requested by courts.
+## Features
 
-Orbit fixes that with how it's built, not with a promise. There's no Orbit server, so there's nothing to sell, leak, hack, or subpoena. If you want to know whether that's true, read the code or get a technical friend to.
+- Log period days, flow, symptoms (mild/moderate/severe), mood, energy and notes
+- One-tap "period started" / "period ended"
+- Current phase and when your next period is likely
+- Predictions that adjust to your own cycle the more you log, with a confidence level
+- Symptom forecast for the next week, based on your past cycles
+- Insights: average cycle, how much it varies, symptoms by phase
+- Optional PIN lock
+- Export/import backups
+- Works offline
 
-## What it does
+## How predictions work
 
-- **Log your cycle.** Period days, flow, symptoms, mood, energy, and notes.
-- **See where you are.** The app shows your current phase (menstrual, follicular, ovulation window, luteal) and how many days are left.
-- **Predictions that learn you.** For the first few cycles Orbit uses typical averages. As you log more, it adjusts to *your* cycle length, how much it varies, and which symptoms usually show up when, and how bad they tend to get.
-- **Honest confidence.** Every prediction shows how sure it is. Three logged cycles give a rough guess, and a year of logs gives a much better one. It never pretends to know more than it does.
-- **Insights.** Your average cycle, how much it varies, and which symptoms, moods, and energy levels show up in each phase.
-- **Export and back up.** Download your data as a file anytime. You own it, so you can move it, back it up, or delete it.
-- **Works offline.** Once it's installed you don't need internet at all.
+All of it is in [`src/cycle.js`](src/cycle.js), tests are in [`tests/cycle.test.js`](tests/cycle.test.js).
 
-## How the predictions work
+- Cycle length is a weighted average of the gaps between period starts. Recent cycles count more. Until you've logged a couple, it uses the numbers from settings (28/5 by default).
+- The date range comes from how much your cycles vary.
+- Ovulation is just estimated as 14 days before the next period. It's an average, not a measurement, so don't use it to plan or avoid pregnancy.
+- Symptoms get forecast if they showed up around the same point in at least half your past cycles. Needs 2 logged cycles first.
+- Gaps over 60 days are treated as missed logging and ignored.
 
-Everything runs on your phone in [`src/cycle.js`](src/cycle.js), and it's tested in [`tests/cycle.test.js`](tests/cycle.test.js).
+## Privacy
 
-- **Cycle length** is a weighted average of the gaps between your period starts, with recent cycles counting more. Until you've logged a few cycles, it leans on the cycle length in your settings.
-- **The range** ("likely Oct 28 to Nov 1") comes from how much your cycles have varied. The more regular you are, the tighter it gets.
-- **Ovulation** is estimated as 14 days before your next predicted period. That's a textbook average, not a measurement. Don't use it to avoid or plan pregnancy.
-- **Symptom forecasts** look at which symptoms you logged at the same point in past cycles. If something showed up in at least half of them, Orbit says it's likely and how bad it usually is. Forecasts start after two logged cycles.
-- **Gaps longer than 60 days** are treated as missed logging and left out, so they don't throw off the average.
+- Data is stored in IndexedDB on your device. Nothing in the code sends it anywhere (search for `fetch(` if you want to check).
+- No analytics, ads, or third-party SDKs. The only dependencies are Vite and vite-plugin-pwa, see `package.json`.
+- A Content-Security-Policy in `index.html` blocks requests to any other server.
+- No account, so no email or password.
 
-## How the privacy works
-
-| Claim | How you can verify it |
-|---|---|
-| Your data stays on your device | All data is stored in your browser's local storage (IndexedDB) on your phone. Search the code for `fetch(` and you'll find nothing that sends your data anywhere. |
-| No analytics or trackers | No Google Analytics, no Firebase, no ad SDKs, no crash reporters. See `package.json` for every dependency. |
-| No third-party requests | Fonts and icons are bundled with the app. A Content-Security-Policy blocks the app from contacting other servers, even by mistake. |
-| No account | There's no sign-up, so no email, name, or password is ever collected. |
-| Open source | The whole app is in this repo under the GPL-3.0 license. Anyone can audit, fork, or build it themselves. |
-
-**One honest limit:** because your data only lives on your phone, if you lose the phone or clear the browser data without exporting first, it's gone. Nobody, including me, can recover it. Use **Settings → Export** now and then. (Optional opt-in planned for future)
+The downside: if you lose your phone or clear browser data without a backup, your data is gone and I can't get it back. Use Settings → Export every so often.
 
 ## Install
 
-Orbit is a web app you install to your home screen. It's free, there's no app store fee, and you don't need an account.
+It's a web app you add to your home screen.
 
-**Android (Chrome, Brave, Firefox):** open the link above, tap the menu, then **Install app** or **Add to Home screen**.
+- **Android:** open the link, then browser menu → Install app
+- **iPhone:** open it in Safari, then Share → Add to Home Screen. Do this instead of bookmarking it, because Safari can delete website data after 7 days of not using it.
+- **F-Droid:** planned
 
-**iPhone / iPad (Safari):** open the link above, tap **Share**, then **Add to Home Screen**.
-> Install it to the home screen, don't just bookmark it. Safari can delete website data that hasn't been used in 7 days, but home-screen apps are protected from that.
+## Not medical advice
 
-**F-Droid:** coming soon.
+Predictions are estimates from your own logs. **Don't use Orbit as birth control.** If something about your cycle changes or worries you, talk to a doctor.
 
-## Not medical advice. Not birth control.
+## About
 
-Orbit is a logging and pattern tool. Its predictions are **estimates** from your past entries, and bodies don't always follow patterns.
+I'm Hunter, a student into cybersecurity. I built Orbit with help from AI coding tools, and I review what goes in. Since it's all open source, you can check everything yourself.
 
-- **Do not use Orbit to prevent pregnancy.** "Safe day" or fertile-window estimates aren't reliable contraception.
-- It won't diagnose anything. If your cycle changes suddenly, or pain, bleeding, or mood symptoms get worse, talk to a doctor or nurse.
+If something's confusing or missing, [open an issue](../../issues).
 
-## Who made this
-
-I'm Hunter, a student who's into cybersecurity and building useful health tools. I'm a guy, which is exactly why Orbit is built so you don't have to trust me: I never see your data, and the code proves it.
-
-Orbit was shaped by feedback from women who tested it before launch. If something feels off, unclear, or missing, [open an issue](../../issues). That feedback matters more than anything else.
-
-## Build it yourself
+## Running it locally
 
 ```bash
 git clone https://github.com/JUST-F1ZZY/Orbit.git
-cd orbit
+cd Orbit
 npm install
-npm run dev      # local dev server
-npm run build    # production build in dist/
-npm test         # prediction engine tests
+npm run dev
+npm test
 ```
 
 ## Contributing
 
-Bug reports, design feedback, translations, and code are all welcome. One hard rule: **no PR that adds network calls, analytics, or third-party SDKs will be merged.** That's the whole point of the app.
+Bug reports, design feedback, translations and code are welcome. I won't merge anything that adds network calls, analytics or tracking.
 
 ## Support
 
-Orbit is free and will stay free, with no ads, no premium tier, and no data deals. I'm a student building it on my own, so tips are its only funding. They cover getting Orbit onto the app stores (Apple charges $99 a year) and the time it takes to keep improving it. If it helped you and you want to say thanks, you can [buy me a coffee on Ko-fi](https://ko-fi.com/fizzyyy052326). Totally optional.
+Orbit is free with no ads. Tips are the only funding and go toward app store fees (Apple is $99/year) and the time I put into it. [Ko-fi](https://ko-fi.com/fizzyyy052326) if you want to help.
 
 ## License
 
-[GPL-3.0](LICENSE). You can use, change, and share it, but any version you distribute has to stay open source too. Nobody can take this code and turn it into a closed app that sells data.
+[GPL-3.0](LICENSE)

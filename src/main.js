@@ -19,7 +19,6 @@ const VIEWS = {
   settings: { label: 'Settings', icon: '<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M12 3v3M12 18v3M3 12h3M18 12h3M5.6 5.6l2.1 2.1M16.3 16.3l2.1 2.1M5.6 18.4l2.1-2.1M16.3 7.7l2.1-2.1"/></svg>', view: settingsView },
 };
 
-// One shared object the screens read from and call back into.
 const app = {
   entries: [],
   byDate: new Map(),
@@ -52,7 +51,7 @@ const app = {
   },
 
   render() {
-    // Each render gets a fresh element, so listeners from the last screen go with it.
+    // fresh element each time so old listeners get dropped
     const root = document.createElement('div');
     $('#app').replaceChildren(root);
     if (this.settings.pin && !this.unlocked) {
@@ -78,7 +77,6 @@ const app = {
 };
 
 function renderTabs(a) {
-  // Small always-visible tip link, bottom left above the tabs.
   if (KOFI_URL && !$('#tip')) {
     const tip = document.createElement('a');
     tip.id = 'tip';
@@ -106,8 +104,7 @@ function renderTabs(a) {
     .join('');
 }
 
-// Coming back to the app on a new day should move "today" forward.
-// Re-lock after a minute in the background.
+// relock after 1 min in background, refresh if the day changed
 const RELOCK_MS = 60000;
 document.addEventListener('visibilitychange', () => {
   if (document.visibilityState === 'hidden') {
@@ -124,7 +121,6 @@ document.addEventListener('visibilitychange', () => {
 db.requestPersistence();
 app.reload();
 
-// Keyboard users: Escape closes the log sheet.
 document.addEventListener('keydown', (e) => {
   if (e.key === 'Escape') closeSheet();
 });
