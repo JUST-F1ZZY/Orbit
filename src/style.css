@@ -300,3 +300,7 @@ textarea { resize: vertical; }
   text-decoration: none;
   box-shadow: 0 4px 14px rgb(0 0 0 / 0.35);
 }
+
+/* One-time support card */
+.support { border: 1px solid var(--luteal); }
+a.button { text-decoration: none; }

@@ -2,6 +2,7 @@ import { PHASES, SEVERITY, forecastAhead, symptomLabel as symLabel } from '../cy
 import * as db from '../db.js';
 import { formatDate, addDays, diffDays } from '../dates.js';
 import { $, esc, toast } from '../ui.js';
+import { KOFI_URL, SUPPORT_NOTE } from '../config.js';
 
 // The cycle wheel: four phase arcs and a dot for today.
 function ring(a) {
@@ -117,6 +118,20 @@ function backupNudge(app) {
   </section>`;
 }
 
+// One-time ask, only after Orbit has tracked two full cycles for someone.
+function supportCard(app) {
+  if (!KOFI_URL || app.settings.supportCardDone || app.analysis.cycles.length < 2) return '';
+  return `<section class="card support">
+    <b>Orbit has tracked ${app.analysis.cycles.length} of your cycles 💗</b>
+    <p class="muted small">${SUPPORT_NOTE}</p>
+    <p class="muted small">If it's been useful, a tip of any size helps. This is the only time Orbit will ask.</p>
+    <div class="row">
+      <a class="button" data-action="support" href="${KOFI_URL}" target="_blank" rel="noopener noreferrer">Support on Ko-fi</a>
+      <button data-action="support-dismiss" class="secondary">No thanks</button>
+    </div>
+  </section>`;
+}
+
 export function render(app) {
   const a = app.analysis;
   const header = `<header class="page-head"><p class="muted">${formatDate(app.today, { weekday: 'long', month: 'long', day: 'numeric' })}</p><h1>Today</h1></header>`;
@@ -154,6 +169,7 @@ export function render(app) {
 
   ${lateNote}
   ${backupNudge(app)}
+  ${supportCard(app)}
 
   <section class="card">
     <h2>Next period</h2>
@@ -199,6 +215,11 @@ export function bind(app, root) {
     }
     if (action === 'snooze') {
       await db.saveSettings({ ...app.settings, backupSnoozedUntil: addDays(app.today, 7) });
+    }
+    if (action === 'support' || action === 'support-dismiss') {
+      // Either way, never show the card again.
+      await db.saveSettings({ ...app.settings, supportCardDone: true });
+      if (action === 'support-dismiss') toast('No problem. Thanks for using Orbit');
     }
     if (action === 'ended') {
       await merge(app.today, { periodEnded: true });

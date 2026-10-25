@@ -106,7 +106,7 @@ Bug reports, design feedback, translations, and code are all welcome. One hard r
 
 ## Support
 
-Orbit is free and will stay free, with no ads, no premium tier, and no data deals. If it helped you and you want to say thanks, you can [buy me a coffee on Ko-fi](https://ko-fi.com/fizzyyy052326). Totally optional.
+Orbit is free and will stay free, with no ads, no premium tier, and no data deals. I'm a student building it on my own, so tips are its only funding. They cover getting Orbit onto the app stores (Apple charges $99 a year) and the time it takes to keep improving it. If it helped you and you want to say thanks, you can [buy me a coffee on Ko-fi](https://ko-fi.com/fizzyyy052326). Totally optional.
 
 ## License
 
