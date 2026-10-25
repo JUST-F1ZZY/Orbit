@@ -1,5 +1,4 @@
-// All of Orbit's data lives here, in IndexedDB on the user's device.
-// Nothing in this file (or anywhere else) sends it over the network.
+// everything is stored locally in IndexedDB, nothing leaves the device
 
 import { today } from './dates.js';
 
@@ -16,7 +15,6 @@ function open() {
     const req = indexedDB.open(DB_NAME, DB_VERSION);
     req.onupgradeneeded = () => {
       const db = req.result;
-      // One entry per day, keyed by ISO date:
       // { date: '2026-10-24', flow, symptoms: { cramps: 2 }, mood, energy, note }
       if (!db.objectStoreNames.contains(ENTRIES)) db.createObjectStore(ENTRIES, { keyPath: 'date' });
       if (!db.objectStoreNames.contains(SETTINGS)) db.createObjectStore(SETTINGS);
@@ -52,16 +50,12 @@ export async function deleteEverything() {
   await run(SETTINGS, 'readwrite', (s) => s.clear());
 }
 
-// Ask the browser not to auto-delete our data when the phone is low on space.
 export async function requestPersistence() {
   if (navigator.storage?.persist) return navigator.storage.persist();
   return false;
 }
 
-// Export is the only backup, since there's no server. On phones it opens the
-// Share sheet (Save to Files, AirDrop, email to yourself), because iOS often
-// can't download files from a home-screen app. Elsewhere it downloads a file.
-// Resolves true once the file was handed off, false if the user cancelled.
+// iOS can't download files from a home screen app, so phones use the share sheet
 export async function exportData() {
   const data = {
     app: 'orbit',
@@ -92,7 +86,6 @@ export async function exportData() {
   return true;
 }
 
-// Merges a backup file into the current data. Same-day entries are overwritten.
 export async function importData(file) {
   const data = JSON.parse(await file.text());
   if (data.app !== 'orbit' || !Array.isArray(data.entries)) throw new Error('Not an Orbit backup file');

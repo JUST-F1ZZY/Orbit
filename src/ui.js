@@ -1,6 +1,3 @@
-// Small DOM helpers shared by the screens.
-
-// Escapes user text before it goes into innerHTML (notes, mostly).
 export function esc(s) {
   return String(s ?? '').replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[c]);
 }
@@ -23,7 +20,6 @@ export function toast(msg) {
   toastTimer = setTimeout(() => t.classList.remove('show'), 2200);
 }
 
-// Bottom sheet used for the daily log. Returns the sheet's content element.
 export function openSheet(html) {
   closeSheet();
   const wrap = document.createElement('div');

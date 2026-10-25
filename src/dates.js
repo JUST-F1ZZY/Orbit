@@ -1,5 +1,4 @@
-// Dates are stored as local 'YYYY-MM-DD' strings. All math goes through UTC
-// so daylight-saving changes never make a day 23 or 25 hours long.
+// dates are 'YYYY-MM-DD' strings. math is done in UTC so DST doesn't break it
 
 const DAY = 86400000;
 
@@ -22,7 +21,6 @@ export function addDays(iso, n) {
   return d.toISOString().slice(0, 10);
 }
 
-// Whole days from a to b (positive when b is later).
 export const diffDays = (a, b) => Math.round((toUTC(b) - toUTC(a)) / DAY);
 
 export function formatDate(iso, opts = { month: 'short', day: 'numeric' }) {

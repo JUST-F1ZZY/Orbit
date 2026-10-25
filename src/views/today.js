@@ -4,7 +4,6 @@ import { formatDate, addDays, diffDays } from '../dates.js';
 import { $, esc, toast } from '../ui.js';
 import { KOFI_URL, SUPPORT_NOTE } from '../config.js';
 
-// The cycle wheel: four phase arcs and a dot for today.
 function ring(a) {
   const L = a.cycleLength;
   const C = 2 * Math.PI * 80;
@@ -85,7 +84,6 @@ function todayLogSummary(app) {
   return `<p class="muted small logged-today">Logged today: ${bits.join(' · ') || 'mood/energy'}</p>`;
 }
 
-// One-tap buttons so a period doesn't take five trips through the log sheet.
 function quickActions(app) {
   const a = app.analysis;
   const e = app.byDate.get(app.today);
@@ -96,7 +94,6 @@ function quickActions(app) {
     main = (bleedingToday ? '' : '<button data-action="still">Still bleeding</button>') +
       '<button data-action="ended" class="secondary">Period ended</button>';
   } else if (a.phase === 'menstrual') {
-    // Bled today but already marked it as the last day.
     main = '';
   } else {
     main = '<button data-action="started">Period started</button>';
@@ -104,7 +101,6 @@ function quickActions(app) {
   return `<div class="row center-row quick">${main}${log}</div>`;
 }
 
-// Nudge to export when there's real data and no backup in 30 days.
 function backupNudge(app) {
   const s = app.settings;
   if (app.entries.length < 5) return '';
@@ -118,7 +114,7 @@ function backupNudge(app) {
   </section>`;
 }
 
-// One-time ask, only after Orbit has tracked two full cycles for someone.
+// only shows once, after 2 cycles
 function supportCard(app) {
   if (!KOFI_URL || app.settings.supportCardDone || app.analysis.cycles.length < 2) return '';
   return `<section class="card support">
@@ -203,7 +199,7 @@ export function bind(app, root) {
       toast('Period started. Tap Edit today to change the flow.');
     }
     if (action === 'still') {
-      // Fill a forgotten day or two since the last logged bleeding day.
+      // fill in a day or two if they forgot
       const end = app.analysis.lastPeriod.end;
       const from = diffDays(end, app.today) <= 2 ? addDays(end, 1) : app.today;
       for (let d = from; d <= app.today; d = addDays(d, 1)) await merge(d, { flow: bleeding(d) });
@@ -217,7 +213,6 @@ export function bind(app, root) {
       await db.saveSettings({ ...app.settings, backupSnoozedUntil: addDays(app.today, 7) });
     }
     if (action === 'support' || action === 'support-dismiss') {
-      // Either way, never show the card again.
       await db.saveSettings({ ...app.settings, supportCardDone: true });
       if (action === 'support-dismiss') toast('No problem. Thanks for using Orbit');
     }
